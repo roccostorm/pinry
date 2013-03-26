@@ -73,7 +73,7 @@ MESSAGE_TAGS = {
     messages.SUCCESS: 'alert alert-success',
     messages.INFO: 'alert alert-info',
 }
-API_LIMIT_PER_PAGE = 30
+API_LIMIT_PER_PAGE = 50
 
 
 INSTALLED_APPS = (
@@ -90,6 +90,7 @@ INSTALLED_APPS = (
     'pinry.users',
 )
 
+IMAGE_PATH = 'pinry.core.utils.upload_path'
 IMAGE_SIZES = {
     'thumbnail': {'size': [240, 0]},
     'standard': {'size': [600, 0]},

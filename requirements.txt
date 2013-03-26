@@ -1,10 +1,11 @@
 Django
 Pillow
 South
-django-tastypie
+django-tastypie==0.9.12
 django-braces
 mock
 factory-boy
 django_compressor
-http://github.com/mirumee/django-images/tarball/master#egg=django-images
+requests
+http://github.com/kklimonda/django-images/tarball/master#egg=django-images
 http://github.com/hcarvalhoalves/django-taggit/tarball/master#egg=django-taggit
