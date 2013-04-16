@@ -1,8 +1,9 @@
 from django.conf import settings
 from django.contrib.auth.models import Permission
-from django.core.files import File
+from django.core.files.images import ImageFile
 from django.db.models.query import QuerySet
 from django.test import TestCase
+from django_images.models import Thumbnail
 
 import factory
 from taggit.models import Tag
@@ -11,7 +12,7 @@ from ..models import Pin, Image
 from ...users.models import User
 
 
-TEST_IMAGE_PATH = settings.SITE_ROOT + 'logo.png'
+TEST_IMAGE_PATH = 'logo.png'
 
 
 class UserFactory(factory.Factory):
@@ -33,7 +34,14 @@ class TagFactory(factory.Factory):
 
 
 class ImageFactory(factory.Factory):
-    image = factory.LazyAttribute(lambda a: File(open(TEST_IMAGE_PATH)))
+    FACTORY_FOR = Image
+
+    image = factory.LazyAttribute(lambda a: ImageFile(open(TEST_IMAGE_PATH, 'rb')))
+
+    @factory.post_generation()
+    def create_thumbnails(self, create, extracted, **kwargs):
+        for size in settings.IMAGE_SIZES.keys():
+            Thumbnail.objects.get_or_create_at_size(self.pk, size)
 
 
 class PinFactory(factory.Factory):

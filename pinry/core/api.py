@@ -59,7 +59,7 @@ class UserResource(ModelResource):
 
 def filter_generator_for(size):
     def wrapped_func(bundle, **kwargs):
-        return Thumbnail.objects.get_or_create_at_size(bundle.obj.pk, size, **kwargs)
+        return bundle.obj.get_by_size(size)
     return wrapped_func
 
 
@@ -98,6 +98,20 @@ class PinResource(ModelResource):
         if url:
             image = Image.objects.create_for_url(url)
             bundle.data['image'] = '/api/v1/image/{}/'.format(image.pk)
+        return bundle
+
+    def hydrate(self, bundle):
+        """Run some early/generic processing
+
+        Make sure that user is authorized to create Pins first, before
+        we hydrate the Image resource, creating the Image object in process
+        """
+        submitter = bundle.data.get('submitter', None)
+        if not submitter:
+            bundle.data['submitter'] = '/api/v1/user/{}/'.format(bundle.request.user.pk)
+        else:
+            if not '/api/v1/user/{}/'.format(bundle.request.user.pk) == submitter:
+                raise Unauthorized("You are not authorized to create Pins for other users")
         return bundle
 
     def dehydrate_tags(self, bundle):

@@ -2,7 +2,7 @@
  * Pinry
  * Descrip: Core of pinry, loads and tiles pins.
  * Authors: Pinry Contributors
- * Updated: Mar 3rd, 2013
+ * Updated: Apr 5th, 2013
  * Require: jQuery, Pinry JavaScript Helpers
  */
 
@@ -91,12 +91,23 @@ $(window).load(function() {
         blockContainer.css('height', colHeights.sort().slice(-1)[0]);
     }
 
+    /**
+     * On scroll load more pins from the server
+     */
+    window.scrollHandler = function() {
+        var windowPosition = $(window).scrollTop() + $(window).height();
+        var bottom = $(document).height() - 100;
+        if(windowPosition > bottom) loadPins();
+    }
 
     /**
      * Load our pins using the pins template into our UI, be sure to define a
      * offset outside the function to keep a running tally of your location.
      */
     function loadPins() {
+        // Disable scroll
+        $(window).off('scroll');
+
         // Show our loading symbol
         $('.spinner').css('display', 'block');
 
@@ -125,9 +136,8 @@ $(window).load(function() {
                 });
             });
 
-            if (pins.objects.length == 0 || pins.objects.length < 30) {
+            if (pins.objects.length < apiLimitPerPage) {
                 $('.spinner').css('display', 'none');
-                $(window).off('scroll');
                 if ($('#pins').length != 0) {
                     var theEnd = document.createElement('div');
                     theEnd.id = 'the-end';
@@ -135,6 +145,8 @@ $(window).load(function() {
                     $(theEnd).css('padding', 50);
                     $('body').append(theEnd);
                 }
+            } else {
+                $(window).scroll(scrollHandler);
             }
         });
 
@@ -152,11 +164,4 @@ $(window).load(function() {
         tileLayout();
         lightbox();
     })
-
-    // If we scroll to the bottom of the document load more pins
-    $(window).scroll(function() {
-        var windowPosition = $(window).scrollTop() + $(window).height();
-        var bottom = $(document).height() - 100;
-        if(windowPosition > bottom) loadPins();
-     });
 });
